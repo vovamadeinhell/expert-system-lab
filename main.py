@@ -169,7 +169,7 @@ def next_question(
     facts: dict[str, str],
     goal: str = GOAL,
 ) -> tuple[str, str] | None:
-    """Выбирает неизвестный факт из кратчайшей возможной цепочки к цели."""
+    """Берёт первый неизвестный факт из кратчайшей цепочки к цели."""
     paths = question_paths_for_goal(rules, facts, goal)
     nonempty_paths = [path for path in paths if path]
     if not nonempty_paths:
@@ -203,9 +203,10 @@ def forward_chain(
 
                 if name not in working_memory:
                     working_memory[name] = value
+                    kind = "итоговый диагноз" if name == GOAL else "промежуточный факт"
                     trace.append(
                         f"Сработало правило {index + 1}: {rule}; "
-                        f"в рабочую базу добавлен факт {name}={value}"
+                        f"в рабочую базу добавлен {kind} {name}={value}"
                     )
                     fired_this_pass = True
                 elif working_memory[name] != value:
@@ -289,8 +290,9 @@ def run_expert_system() -> None:
 
 
 def add_rule(rules: list[Rule]) -> None:
-    print("\nВведите правило, заменив примеры конкретными признаками:")
-    print("ЕСЛИ Экран_полосит=да ТО Диагноз=возможная_неисправность_матрицы")
+    print("\nВведите правило, заменив пример конкретными признаками:")
+    print("ЕСЛИ Компьютер_включается=да И Корпус_перегревается=да "
+          "ТО Диагноз=вероятный_перегрев_компьютера")
     line = input("> ").strip()
 
     try:
